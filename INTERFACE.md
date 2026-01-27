@@ -165,3 +165,41 @@ truncated: false
 ## `pack/policy.md`
 
 Phase 1 ships an empty `policy.md` placeholder so the pack surface stays stable as future phases begin deriving normalized rules. The file MUST exist at `pack/policy.md` but contains zero bytes (no header, no newline). Later phases will populate it with extracted policy lines, but until then consumers should treat the empty file as the intentional signal that policy extraction is not yet implemented.
+
+## `pack/lint.json`
+
+`lint.json` enumerates every issue the pack builder detected so downstream systems can fail fast or surface guidance without reparsing logs.
+
+| field | type | description | constraints |
+| --- | --- | --- | --- |
+| `issues` | array<object> | Normalized lint findings sorted by deterministic priority (higher severity first, then stable by `id`). | Optional but, when present, every entry must follow the schema below. |
+
+### `issues[]` entry
+
+| field | type | description | constraints |
+| --- | --- | --- | --- |
+| `id` | string | Stable identifier for the lint rule (e.g., `missing-readme`). | Non-empty ASCII; repeat the same `id` for identical rules across runs so tooling can de-dupe. |
+| `severity` | string | Importance of the issue for consumers. | Must be exactly one of `info`, `warn`, or `error`; lowercase only. |
+| `message` | string | Human-readable explanation of the issue. | Concise English sentence that gives concrete remediation hints. |
+| `files` | array<string> | Repo-relative POSIX paths the issue applies to. | Empty array allowed for repo-wide findings; otherwise include `./`-less paths. |
+
+### Minimal lint example
+
+```json
+{
+  "issues": [
+    {
+      "id": "missing-tests",
+      "severity": "warn",
+      "message": "No tests matched the include globs; double-check the repo path and filters.",
+      "files": []
+    },
+    {
+      "id": "large-file",
+      "severity": "info",
+      "message": "Skipped docs/legacy.md because it exceeds the 200 KB file limit.",
+      "files": ["docs/legacy.md"]
+    }
+  ]
+}
+```
