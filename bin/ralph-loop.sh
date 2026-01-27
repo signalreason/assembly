@@ -17,7 +17,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT" || die "Unable to reach repo root from $SCRIPT_DIR"
 
 TASKS_FILE="${TASKS_FILE:-$REPO_ROOT/prd.json}"
-PROMPT_FILE="${PROMPT_FILE:-$REPO_ROOT/prompts/autonomous-senior-engineer.prompt}"
+PROMPT_FILE="${PROMPT_FILE:-$REPO_ROOT/prompts/autonomous-senior-engineer.prompt.md}"
 ASSIGNEE="${ASSIGNEE:-ralph-loop}"
 TASK_AGENT_BIN="${TASK_AGENT_BIN:-$REPO_ROOT/bin/task-agent.sh}"
 DELAY_SECONDS=0
