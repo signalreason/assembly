@@ -19,8 +19,8 @@
       "task_id": "ASM-001",
       "title": "Define pack/manifest.json schema in INTERFACE.md",
       "model": "gpt-5.1-codex",
-      "status": "unstarted",
-      "assignee": "assembly-loop",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "INTERFACE.md exists in repo root.",
         "Manifest section lists required fields with types and constraints.",
@@ -39,7 +39,11 @@
         ],
         "ci_checks": [
           "lint_md"
-        ]
+        ],
+        "run_attempts": 1,
+        "last_run_id": "20260127T224200Z-65016",
+        "last_update_utc": "2026-01-27T22:43:05Z",
+        "last_note": "Run 20260127T224200Z-65016 completed"
       }
     },
     {
