@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.0",
+  "artifact": "assembly-mvp",
+  "merge_ordering": "sequential_in_array_order",
+  "conventions": {
+    "task_id_prefix": "ASM",
+    "logging": {
+      "format": "json",
+      "required_fields": [
+        "run_id",
+        "task_id",
+        "event",
+        "status"
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "ASM-001",
+      "title": "Define pack/manifest.json schema in INTERFACE.md",
+      "model": "gpt-5.1-codex",
+      "status": "unstarted",
+      "assignee": "assembly-loop",
+      "definition_of_done": [
+        "INTERFACE.md exists in repo root.",
+        "Manifest section lists required fields with types and constraints.",
+        "repo_commit fallback of \"unknown\" and created_at RFC3339 are documented.",
+        "Minimal manifest example JSON included."
+      ],
+      "recommended": {
+        "approach": "Keep schema descriptions precise and machine-oriented; prefer tables or bullet lists."
+      },
+      "observability": {
+        "log_events": [
+          "interface_manifest_doc_written"
+        ],
+        "metrics": [
+          "manifest_fields_count"
+        ],
+        "ci_checks": [
+          "lint_md"
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-002",
+      "title": "Define pack/index.json schema in INTERFACE.md",
+      "model": "gpt-5.1-codex",
+      "status": "unstarted",
+      "assignee": "assembly-loop",
+      "definition_of_done": [
+        "Index section lists files entry fields: path, sha256, size_bytes, token_est, score, selected.",
+        "Index section documents total_token_est and its relation to file entries.",
+        "Minimal index example JSON included."
+      ],
+      "recommended": {
+        "approach": "Keep types explicit (string, integer, boolean) and mark required fields."
+      },
+      "observability": {
+        "log_events": [
+          "interface_index_doc_written"
+        ],
+        "metrics": [
+          "index_fields_count"
+        ],
+        "ci_checks": [
+          "lint_md"
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-003",
+      "title": "Define pack/context.md and pack/policy.md formats in INTERFACE.md",
+      "model": "gpt-5.1-codex",
+      "status": "unstarted",
+      "assignee": "assembly-loop",
+      "definition_of_done": [
+        "Context block format documented with required metadata keys and delimiter lines.",
+        "Documented semantics for lines range, truncated flag, and git commit.",
+        "Policy.md documented as an empty file in Phase 1."
+      ],
+      "recommended": {
+        "approach": "Describe the block layout line-by-line and include a short example."
+      },
+      "observability": {
+        "log_events": [
+          "interface_context_policy_doc_written"
+        ],
+        "metrics": [
+          "context_fields_count"
+        ],
+        "ci_checks": [
+          "lint_md"
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-004",
+      "title": "Define pack/lint.json schema in INTERFACE.md",
+      "model": "gpt-5.1-codex",
+      "status": "unstarted",
+      "assignee": "assembly-loop",
+      "definition_of_done": [
+        "Lint section lists issues entry fields: id, severity, message, files.",
+        "Severity constrained to info|warn|error is documented.",
+        "Minimal lint example JSON included."
+      ],
+      "recommended": {
+        "approach": "Keep lint schema minimal; avoid suggesting extra severity levels."
+      },
+      "observability": {
+        "log_events": [
+          "interface_lint_doc_written"
+        ],
+        "metrics": [
+          "lint_fields_count"
+        ],
+        "ci_checks": [
+          "lint_md"
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-005",
+      "title": "Create assembly/examples/pack-minimal/ sample pack",
+      "model": "gpt-5.1-codex",
+      "status": "unstarted",
+      "assignee": "assembly-loop",
+      "definition_of_done": [
+        "Directory assembly/examples/pack-minimal/ exists with manifest.json, index.json, context.md, policy.md, lint.json.",
+        "Sample contents match INTERFACE.md schema and are internally consistent.",
+        "policy.md is present and empty."
+      ],
+      "recommended": {
+        "approach": "Use a tiny, consistent example with one file entry and one context block."
+      },
+      "observability": {
+        "log_events": [
+          "example_pack_created"
+        ],
+        "metrics": [
+          "example_files_count"
+        ],
+        "ci_checks": [
+          "lint_json"
+        ]
+      }
+    }
+  ]
+}
