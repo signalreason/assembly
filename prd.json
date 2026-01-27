@@ -140,8 +140,8 @@
       "task_id": "ASM-005",
       "title": "Create assembly/examples/pack-minimal/ sample pack",
       "model": "gpt-5.1-codex",
-      "status": "unstarted",
-      "assignee": "assembly-loop",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "Directory assembly/examples/pack-minimal/ exists with manifest.json, index.json, context.md, policy.md, lint.json.",
         "Sample contents match INTERFACE.md schema and are internally consistent.",
@@ -159,7 +159,11 @@
         ],
         "ci_checks": [
           "lint_json"
-        ]
+        ],
+        "run_attempts": 1,
+        "last_run_id": "20260127T224552Z-70527",
+        "last_update_utc": "2026-01-27T22:48:21Z",
+        "last_note": "Run 20260127T224552Z-70527 completed"
       }
     }
   ]

@@ -1,0 +1,13 @@
+{
+  "total_token_est": 2375,
+  "files": [
+    {
+      "path": "INTERFACE.md",
+      "sha256": "b0648f0c2519fc8d7951ef5bbaf57ddb8763edc0cfa9c597534f6184a4de1ef8",
+      "size_bytes": 9498,
+      "token_est": 2375,
+      "score": 8,
+      "selected": true
+    }
+  ]
+}
