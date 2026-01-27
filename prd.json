@@ -80,8 +80,8 @@
       "task_id": "ASM-003",
       "title": "Define pack/context.md and pack/policy.md formats in INTERFACE.md",
       "model": "gpt-5.1-codex",
-      "status": "unstarted",
-      "assignee": "assembly-loop",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "Context block format documented with required metadata keys and delimiter lines.",
         "Documented semantics for lines range, truncated flag, and git commit.",
@@ -99,7 +99,11 @@
         ],
         "ci_checks": [
           "lint_md"
-        ]
+        ],
+        "run_attempts": 1,
+        "last_run_id": "20260127T224413Z-68074",
+        "last_update_utc": "2026-01-27T22:45:04Z",
+        "last_note": "Run 20260127T224413Z-68074 completed"
       }
     },
     {

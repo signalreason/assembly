@@ -119,3 +119,49 @@ The index lists every file considered for the pack along with deterministic scor
 ```
 
 In the example above, `total_token_est` equals `600 + 300 = 900`, demonstrating the required relationship between the aggregate and the per-file entries.
+
+## `pack/context.md`
+
+`context.md` is a machine-readable markdown log of every snippet emitted into the pack. The file is a concatenation of snippet blocks, each introduced and terminated by delimiter lines so downstream tooling can stream-parse the file without fully loading it.
+
+### Block layout (per snippet)
+
+1. `---` (three hyphens) begins the metadata header.
+2. Five metadata lines, each in `key: value` form:
+   - `path: <repo-relative POSIX path>`
+   - `lines: <start>-<end>`
+   - `git: <commit-sha-or-unknown>`
+   - `score: <integer>`
+   - `truncated: <true|false>`
+3. `---` closes the header.
+4. Raw snippet text exactly as copied from the source file; no additional fences or indentation are added. The snippet ends immediately before the next `---` line or EOF.
+
+### Metadata semantics
+
+| key | type | description | constraints |
+| --- | --- | --- | --- |
+| `path` | string | Repo-relative POSIX path to the source file. | Always matches an entry in `pack/index.json`; use forward slashes and omit leading `./`. |
+| `lines` | string | Inclusive `start-end` line numbers corresponding to the snippet within `path`. | Start and end are positive integers with `start <= end`; numbers refer to the file revision at `git`. |
+| `git` | string | Git commit SHA that produced the snippet. | Use the same 40-char SHA as `manifest.repo_commit`; fall back to `unknown` when the repo state lacks commits. |
+| `score` | integer | Selection score used for ordering snippets. | Matches the score assigned in `pack/index.json`; higher scores appear earlier when other ordering factors tie. |
+| `truncated` | boolean | Whether the snippet omits trailing content from the source because of the token budget. | `true` when only a prefix of the file fits; `false` when the entire file segment from `start` to `end` is present. |
+
+The `lines` range must always reflect the snippet boundaries actually present in the block, even when `truncated: true`. Downstream tools can rely on `git` plus `path` and `lines` to reconstruct or diff the source, so the trio must remain consistent.
+
+### Minimal context example
+
+```
+---
+path: README.md
+lines: 1-24
+git: 4f3b6ad9c2f4c1e8d7fca3b1c5d2e6141c8fb2aa
+score: 3
+truncated: false
+---
+# Project README
+...
+```
+
+## `pack/policy.md`
+
+Phase 1 ships an empty `policy.md` placeholder so the pack surface stays stable as future phases begin deriving normalized rules. The file MUST exist at `pack/policy.md` but contains zero bytes (no header, no newline). Later phases will populate it with extracted policy lines, but until then consumers should treat the empty file as the intentional signal that policy extraction is not yet implemented.
