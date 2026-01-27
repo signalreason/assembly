@@ -50,8 +50,8 @@
       "task_id": "ASM-002",
       "title": "Define pack/index.json schema in INTERFACE.md",
       "model": "gpt-5.1-codex",
-      "status": "unstarted",
-      "assignee": "assembly-loop",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "Index section lists files entry fields: path, sha256, size_bytes, token_est, score, selected.",
         "Index section documents total_token_est and its relation to file entries.",
@@ -69,7 +69,11 @@
         ],
         "ci_checks": [
           "lint_md"
-        ]
+        ],
+        "run_attempts": 1,
+        "last_run_id": "20260127T224306Z-66541",
+        "last_update_utc": "2026-01-27T22:44:13Z",
+        "last_note": "Run 20260127T224306Z-66541 completed"
       }
     },
     {

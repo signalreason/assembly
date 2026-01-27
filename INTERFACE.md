@@ -71,3 +71,51 @@ The manifest lists canonical pack files so other tools can fetch them without as
 ```
 
 The example above uses `repo_commit: "unknown"` to illustrate the fallback for non-git builds, and `created_at` is formatted as RFC3339 with a UTC offset.
+
+## `pack/index.json`
+
+The index lists every file considered for the pack along with deterministic scoring metadata so downstream tools can reason about coverage without opening `context.md`.
+
+| field | type | description | constraints |
+| --- | --- | --- | --- |
+| `files` | array<object> | Ordered list of candidate files ranked per the scoring rules. | Non-empty when any files are analyzed; order is stable and must match the selection pipeline. |
+| `total_token_est` | integer | Aggregate token estimate for the pack. | Must equal the sum of `token_est` across every entry in `files`; recompute whenever any entry changes. |
+
+### `files[]` entry
+
+| field | type | description | constraints |
+| --- | --- | --- | --- |
+| `path` | string | Repo-relative POSIX path to the file. | Always use forward slashes; no leading `./`. |
+| `sha256` | string | Hex-encoded SHA-256 digest of the file bytes. | Lowercase hex; 64 characters. |
+| `size_bytes` | integer | File size in bytes. | Non-negative integer sourced from the filesystem stat. |
+| `token_est` | integer | Estimated token usage if the full file were included. | Non-negative integer; typically `ceil(bytes/4)` and must be consistent with `total_token_est`. |
+| `score` | integer | Deterministic priority score assigned during selection. | Higher scores indicate earlier selection; ties break by path. |
+| `selected` | boolean | Whether the file (or a snippet from it) was emitted into `context.md`. | `true` when any portion made it into the context; `false` otherwise. |
+
+### Minimal index example
+
+```json
+{
+  "total_token_est": 900,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "50d858e9c54d1a63f0e1d763ce7f1c0c0f6e78fba7e3ea0d3a2c3cfc3cbed221",
+      "size_bytes": 2400,
+      "token_est": 600,
+      "score": 3,
+      "selected": true
+    },
+    {
+      "path": "docs/usage.md",
+      "sha256": "8d615cb3c2a7d7f6507c2d0cb42f2a0bff173a8b7f39f7895d7c6bd5671d042e",
+      "size_bytes": 1200,
+      "token_est": 300,
+      "score": 4,
+      "selected": false
+    }
+  ]
+}
+```
+
+In the example above, `total_token_est` equals `600 + 300 = 900`, demonstrating the required relationship between the aggregate and the per-file entries.
