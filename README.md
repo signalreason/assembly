@@ -2,6 +2,10 @@
 
 Assembly is a minimal, deterministic context compiler that will produce a stable `pack/` directory for agent runners. The spec targets a simple, reproducible selection pipeline and a predictable pack interface.
 
+Note: This project is ~80% AI-generated using
+[Codex CLI](https://github.com/openai/codex), a Swiss Army knife, duct tape, and
+some chewing gum.
+
 ## Completion status (as of 2026-01-27)
 - Phase 1 complete
     - Spec and interface docs are complete (`ASSEMBLY_SPEC.md`, `INTERFACE.md`).
@@ -14,13 +18,19 @@ Assembly is a minimal, deterministic context compiler that will produce a stable
 - Use the pack contract: `INTERFACE.md`.
 - Inspect the example pack: `assembly/examples/pack-minimal/`.
 
-## Run the Ralph loop
+## Development
+
+The ralph loop and task agent, as well as [prd.json](./prd.json), are not part
+of the pack format or selection pipeline. They are optional workflow tooling for
+executing tasks via Codex.
+
+### Run the Ralph loop
 The Ralph loop drives tasks from a tasks JSON file (default: `prd.json`) using the task agent.
 
 Requirements: `bash`, `jq`, and an executable task agent.
 
 ```bash
-bin/ralph-loop.sh --prompt prompts/autonomous-senior-engineer.prompt.md
+bin/ralph-loop.sh
 ```
 
 Common options:
@@ -29,7 +39,7 @@ Common options:
 - `--task-agent <path>`: path to the task agent script (default: `bin/task-agent.sh`).
 - `--delay <seconds>`: pause between cycles.
 
-## Run the task agent
+### Run the task agent
 The task agent runs exactly one task iteration via the Codex CLI.
 
 Requirements: `bash`, `jq`, `git`, and `codex` in `PATH`.
