@@ -20,44 +20,5 @@ some chewing gum.
 
 ## Development
 
-The ralph loop and task agent, as well as [prd.json](./prd.json), are not part
-of the pack format or selection pipeline. They are optional workflow tooling for
-executing tasks via Codex.
-
-### Run the Ralph loop
-The Ralph loop drives tasks from a tasks JSON file (default: `prd.json`) using the task agent.
-
-Requirements: `bash`, `jq`, and an executable task agent.
-
-```bash
-bin/ralph-loop.sh
-```
-
-Common options:
-- `--tasks <path>`: tasks JSON file (default: `prd.json`).
-- `--assignee <name>`: assignee label (default: `ralph-loop`).
-- `--task-agent <path>`: path to the task agent script (default: `bin/task-agent.sh`).
-- `--delay <seconds>`: pause between cycles.
-
-### Run the task agent
-The task agent runs exactly one task iteration via the Codex CLI.
-
-Requirements: `bash`, `jq`, `git`, and `codex` in `PATH`.
-
-```bash
-bin/task-agent.sh \
-  --tasks prd.json \
-  --task-id ASM-001 \
-  --assignee ralph-loop \
-  --prompt prompts/autonomous-senior-engineer.prompt.md
-```
-
-You can also select the next runnable task:
-
-```bash
-bin/task-agent.sh \
-  --tasks prd.json \
-  --next \
-  --assignee ralph-loop \
-  --prompt prompts/autonomous-senior-engineer.prompt.md
-```
+The Ralph loop and task agent have moved to https://github.com/signalreason/lever.
+This repo focuses on the pack spec and compiler; see Lever for task-running tools.
