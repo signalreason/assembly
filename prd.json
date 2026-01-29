@@ -166,8 +166,8 @@
       "task_id": "ASM-009",
       "title": "Wire assembly build CLI to emit deterministic pack outputs",
       "model": "gpt-5.2-codex",
-      "status": "unstarted",
-      "assignee": "unassigned",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "assembly build reads repo, task input, include/exclude, out, max-tokens, task-id.",
         "pack/manifest.json reflects inputs, outputs, repo_commit, created_at, tool_version.",
@@ -178,7 +178,10 @@
         "approach": "Build outputs in memory, then write to disk in a fixed order."
       },
       "observability": {
-        "run_attempts": 0
+        "run_attempts": 1,
+        "last_run_id": "20260129T032729Z-16155",
+        "last_update_utc": "2026-01-29T03:30:11Z",
+        "last_note": "Run 20260129T032729Z-16155 completed"
       }
     },
     {
