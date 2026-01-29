@@ -1,9 +1,13 @@
 # Assembly Pack Interface
+Assembly is the context compiler powering Agency's stage-gated runtime. The pack stays frozen once emitted so `control` and `crowbar` can rely on deterministic surfaces.
 
-## `pack/manifest.json`
+## Pack Surfaces
 
-Machine consumers rely on the manifest to discover how a pack was built and where to find its artifacts. Every manifest **must** contain the fields below.
+### `pack/manifest.json` (build receipt)
+**Job:** Tell downstream tools exactly how the pack was produced and where to find every artifact.
+**Signals:** `repo_commit`, `task_id`, `max_tokens`, input echo, output paths, build timestamp, and CLI version.
 
+#### Field schema
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `repo_commit` | string | Git HEAD commit SHA used to produce this pack. | Use the exact 40-char SHA when the repo has commits; otherwise emit the literal string `unknown`. |
@@ -14,17 +18,15 @@ Machine consumers rely on the manifest to discover how a pack was built and wher
 | `created_at` | string | Timestamp for when the manifest was produced. | RFC3339 format with timezone offset; precision at least to seconds. |
 | `tool_version` | string | Semantic version of the `assembly` CLI. | Non-empty string; bump whenever breaking changes occur. |
 
-### `inputs` object
-
+#### `inputs` object
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `task` | string | Original task text or `@<file>` reference from CLI. | Preserve exact user-provided value. |
 | `repo` | string | Absolute or repo-relative path passed via `--repo`. | Normalize to real path if resolvable. |
-| `include` | array\<string> | Glob patterns additionally included. | Empty array allowed; default to `["**/*"]` when user omits `--include`. |
-| `exclude` | array\<string> | Glob patterns removed from consideration. | Empty array allowed; default to the CLI’s built-in ignore list when unspecified. |
+| `include` | array<string> | Glob patterns additionally included. | Empty array allowed; default to `["**/*"]` when user omits `--include`. |
+| `exclude` | array<string> | Glob patterns removed from consideration. | Empty array allowed; default to the CLI's built-in ignore list when unspecified. |
 
-### `outputs` object
-
+#### `outputs` object
 The manifest lists canonical pack files so other tools can fetch them without assumptions.
 
 | key | required path |
@@ -35,8 +37,7 @@ The manifest lists canonical pack files so other tools can fetch them without as
 | `policy` | `pack/policy.md` |
 | `lint` | `pack/lint.json` |
 
-### Minimal manifest example
-
+#### Minimal manifest example
 ```json
 {
   "repo_commit": "unknown",
@@ -69,20 +70,19 @@ The manifest lists canonical pack files so other tools can fetch them without as
   "tool_version": "0.1.0"
 }
 ```
-
 The example above uses `repo_commit: "unknown"` to illustrate the fallback for non-git builds, and `created_at` is formatted as RFC3339 with a UTC offset.
 
-## `pack/index.json`
+### `pack/index.json` (selection ledger)
+**Job:** Capture every candidate file plus deterministic scores so downstream tooling can reason about coverage without opening `context.md`.
+**Signals:** Ranked `files[]` entries and a `total_token_est` checksum that always matches the per-entry sum.
 
-The index lists every file considered for the pack along with deterministic scoring metadata so downstream tools can reason about coverage without opening `context.md`.
-
+#### Field schema
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `files` | array<object> | Ordered list of candidate files ranked per the scoring rules. | Non-empty when any files are analyzed; order is stable and must match the selection pipeline. |
 | `total_token_est` | integer | Aggregate token estimate for the pack. | Must equal the sum of `token_est` across every entry in `files`; recompute whenever any entry changes. |
 
-### `files[]` entry
-
+#### `files[]` entry
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `path` | string | Repo-relative POSIX path to the file. | Always use forward slashes; no leading `./`. |
@@ -92,8 +92,7 @@ The index lists every file considered for the pack along with deterministic scor
 | `score` | integer | Deterministic priority score assigned during selection. | Higher scores indicate earlier selection; ties break by path. |
 | `selected` | boolean | Whether the file (or a snippet from it) was emitted into `context.md`. | `true` when any portion made it into the context; `false` otherwise. |
 
-### Minimal index example
-
+#### Minimal index example
 ```json
 {
   "total_token_est": 900,
@@ -117,15 +116,13 @@ The index lists every file considered for the pack along with deterministic scor
   ]
 }
 ```
-
 In the example above, `total_token_est` equals `600 + 300 = 900`, demonstrating the required relationship between the aggregate and the per-file entries.
 
-## `pack/context.md`
+### `pack/context.md` (snippet log)
+**Job:** Emit a machine-readable stream of every snippet inserted into the pack.
+**Format:** Snippets are concatenated blocks separated by metadata fences so stream processors can parse without loading the full file.
 
-`context.md` is a machine-readable markdown log of every snippet emitted into the pack. The file is a concatenation of snippet blocks, each introduced and terminated by delimiter lines so downstream tooling can stream-parse the file without fully loading it.
-
-### Block layout (per snippet)
-
+#### Block layout
 1. `---` (three hyphens) begins the metadata header.
 2. Five metadata lines, each in `key: value` form:
    - `path: <repo-relative POSIX path>`
@@ -136,8 +133,7 @@ In the example above, `total_token_est` equals `600 + 300 = 900`, demonstrating 
 3. `---` closes the header.
 4. Raw snippet text exactly as copied from the source file; no additional fences or indentation are added. The snippet ends immediately before the next `---` line or EOF.
 
-### Metadata semantics
-
+#### Metadata semantics
 | key | type | description | constraints |
 | --- | --- | --- | --- |
 | `path` | string | Repo-relative POSIX path to the source file. | Always matches an entry in `pack/index.json`; use forward slashes and omit leading `./`. |
@@ -148,8 +144,7 @@ In the example above, `total_token_est` equals `600 + 300 = 900`, demonstrating 
 
 The `lines` range must always reflect the snippet boundaries actually present in the block, even when `truncated: true`. Downstream tools can rely on `git` plus `path` and `lines` to reconstruct or diff the source, so the trio must remain consistent.
 
-### Minimal context example
-
+#### Minimal context example
 ```
 ---
 path: README.md
@@ -162,20 +157,20 @@ truncated: false
 ...
 ```
 
-## `pack/policy.md`
+### `pack/policy.md` (policy placeholder)
+**Job:** Keep the surface contract stable even before policy extraction ships.
+**Rules:** The file MUST exist at `pack/policy.md` and contain zero bytes—no header, newline, or placeholder text. Later phases will backfill normalized policy lines, but consumers should currently treat the empty file as an intentional "not implemented yet" signal.
 
-Phase 1 ships an empty `policy.md` placeholder so the pack surface stays stable as future phases begin deriving normalized rules. The file MUST exist at `pack/policy.md` but contains zero bytes (no header, no newline). Later phases will populate it with extracted policy lines, but until then consumers should treat the empty file as the intentional signal that policy extraction is not yet implemented.
+### `pack/lint.json` (lint stream)
+**Job:** Convey normalized lint findings so `control` can halt or warn without re-parsing build logs.
+**Structure:** Optional `issues` array sorted by severity (error → warn → info) and then by stable `id`.
 
-## `pack/lint.json`
-
-`lint.json` enumerates every issue the pack builder detected so downstream systems can fail fast or surface guidance without reparsing logs.
-
+#### Field schema
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `issues` | array<object> | Normalized lint findings sorted by deterministic priority (higher severity first, then stable by `id`). | Optional but, when present, every entry must follow the schema below. |
 
-### `issues[]` entry
-
+#### `issues[]` entry
 | field | type | description | constraints |
 | --- | --- | --- | --- |
 | `id` | string | Stable identifier for the lint rule (e.g., `missing-readme`). | Non-empty ASCII; repeat the same `id` for identical rules across runs so tooling can de-dupe. |
@@ -183,8 +178,7 @@ Phase 1 ships an empty `policy.md` placeholder so the pack surface stays stable 
 | `message` | string | Human-readable explanation of the issue. | Concise English sentence that gives concrete remediation hints. |
 | `files` | array<string> | Repo-relative POSIX paths the issue applies to. | Empty array allowed for repo-wide findings; otherwise include `./`-less paths. |
 
-### Minimal lint example
-
+#### Minimal lint example
 ```json
 {
   "issues": [
