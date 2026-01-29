@@ -100,8 +100,8 @@
       "task_id": "ASM-006",
       "title": "Implement deterministic file inventory, scoring, and pack/index.json",
       "model": "gpt-5.2-codex",
-      "status": "unstarted",
-      "assignee": "unassigned",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "Include/exclude globs are applied with defaults and repo-relative POSIX paths.",
         "File class priority and ASCII path ordering drive deterministic scoring.",
@@ -112,7 +112,10 @@
         "approach": "Build a stable candidate list first, then derive scores and hashes in one pass."
       },
       "observability": {
-        "run_attempts": 0
+        "run_attempts": 1,
+        "last_run_id": "20260129T030857Z-2680",
+        "last_update_utc": "2026-01-29T03:12:02Z",
+        "last_note": "Run 20260129T030857Z-2680 completed"
       }
     },
     {
