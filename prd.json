@@ -122,8 +122,8 @@
       "task_id": "ASM-007",
       "title": "Generate pack/context.md with deterministic snippet selection and truncation",
       "model": "gpt-5.2-codex",
-      "status": "unstarted",
-      "assignee": "unassigned",
+      "status": "completed",
+      "assignee": "ralph-loop",
       "definition_of_done": [
         "Selection walks scored files in order until max token budget is met.",
         "Each selected file emits one snippet with correct lines range and truncated flag.",
@@ -134,7 +134,10 @@
         "approach": "Track remaining token budget and compute line ranges after truncation."
       },
       "observability": {
-        "run_attempts": 0
+        "run_attempts": 1,
+        "last_run_id": "20260129T031202Z-4724",
+        "last_update_utc": "2026-01-29T03:14:46Z",
+        "last_note": "Run 20260129T031202Z-4724 completed"
       }
     },
     {
