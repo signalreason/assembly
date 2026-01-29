@@ -50,9 +50,26 @@ def _posix_relpath(repo_root: Path, path: Path) -> str:
     return rel.as_posix()
 
 
+def _pattern_variants(pattern: str) -> list[str]:
+    variants = [pattern]
+    current = pattern
+    while "**/" in current:
+        current = current.replace("**/", "", 1)
+        if current not in variants:
+            variants.append(current)
+    return variants
+
+
+def _matches_pattern(path: str, pattern: str) -> bool:
+    for candidate in _pattern_variants(pattern):
+        if fnmatchcase(path, candidate):
+            return True
+    return False
+
+
 def _matches_any(path: str, globs: Iterable[str]) -> bool:
     for pattern in globs:
-        if fnmatchcase(path, pattern):
+        if _matches_pattern(path, pattern):
             return True
     return False
 
@@ -82,7 +99,7 @@ def _score_path(path: str, task_paths: set[str]) -> int:
         return 5
     if path == "README.md":
         return 4
-    if fnmatchcase(path, "docs/**/*.md"):
+    if _matches_pattern(path, "docs/**/*.md"):
         return 3
     if path.endswith(".md"):
         return 2
