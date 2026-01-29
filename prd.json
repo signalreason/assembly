@@ -1,19 +1,4 @@
 {
-  "schema_version": "1.0",
-  "artifact": "assembly-mvp",
-  "merge_ordering": "sequential_in_array_order",
-  "conventions": {
-    "task_id_prefix": "ASM",
-    "logging": {
-      "format": "json",
-      "required_fields": [
-        "run_id",
-        "task_id",
-        "event",
-        "status"
-      ]
-    }
-  },
   "tasks": [
     {
       "task_id": "ASM-001",
@@ -31,18 +16,7 @@
         "approach": "Keep schema descriptions precise and machine-oriented; prefer tables or bullet lists."
       },
       "observability": {
-        "log_events": [
-          "interface_manifest_doc_written"
-        ],
-        "metrics": [
-          "manifest_fields_count"
-        ],
-        "ci_checks": [
-          "lint_md"
-        ],
         "run_attempts": 1,
-        "last_run_id": "20260127T224200Z-65016",
-        "last_update_utc": "2026-01-27T22:43:05Z",
         "last_note": "Run 20260127T224200Z-65016 completed"
       }
     },
@@ -61,18 +35,7 @@
         "approach": "Keep types explicit (string, integer, boolean) and mark required fields."
       },
       "observability": {
-        "log_events": [
-          "interface_index_doc_written"
-        ],
-        "metrics": [
-          "index_fields_count"
-        ],
-        "ci_checks": [
-          "lint_md"
-        ],
         "run_attempts": 1,
-        "last_run_id": "20260127T224306Z-66541",
-        "last_update_utc": "2026-01-27T22:44:13Z",
         "last_note": "Run 20260127T224306Z-66541 completed"
       }
     },
@@ -91,18 +54,7 @@
         "approach": "Describe the block layout line-by-line and include a short example."
       },
       "observability": {
-        "log_events": [
-          "interface_context_policy_doc_written"
-        ],
-        "metrics": [
-          "context_fields_count"
-        ],
-        "ci_checks": [
-          "lint_md"
-        ],
         "run_attempts": 1,
-        "last_run_id": "20260127T224413Z-68074",
-        "last_update_utc": "2026-01-27T22:45:04Z",
         "last_note": "Run 20260127T224413Z-68074 completed"
       }
     },
@@ -121,18 +73,7 @@
         "approach": "Keep lint schema minimal; avoid suggesting extra severity levels."
       },
       "observability": {
-        "log_events": [
-          "interface_lint_doc_written"
-        ],
-        "metrics": [
-          "lint_fields_count"
-        ],
-        "ci_checks": [
-          "lint_md"
-        ],
         "run_attempts": 1,
-        "last_run_id": "20260127T224505Z-69278",
-        "last_update_utc": "2026-01-27T22:45:52Z",
         "last_note": "Run 20260127T224505Z-69278 completed"
       }
     },
@@ -151,19 +92,102 @@
         "approach": "Use a tiny, consistent example with one file entry and one context block."
       },
       "observability": {
-        "log_events": [
-          "example_pack_created"
-        ],
-        "metrics": [
-          "example_files_count"
-        ],
-        "ci_checks": [
-          "lint_json"
-        ],
         "run_attempts": 1,
-        "last_run_id": "20260127T224552Z-70527",
-        "last_update_utc": "2026-01-27T22:48:21Z",
         "last_note": "Run 20260127T224552Z-70527 completed"
+      }
+    },
+    {
+      "task_id": "ASM-006",
+      "title": "Implement deterministic file inventory, scoring, and pack/index.json",
+      "model": "gpt-5.2-codex",
+      "status": "unstarted",
+      "assignee": "unassigned",
+      "definition_of_done": [
+        "Include/exclude globs are applied with defaults and repo-relative POSIX paths.",
+        "File class priority and ASCII path ordering drive deterministic scoring.",
+        "Each index entry includes path, sha256, size_bytes, token_est, score, selected.",
+        "total_token_est equals the sum of token_est across files."
+      ],
+      "recommended": {
+        "approach": "Build a stable candidate list first, then derive scores and hashes in one pass."
+      },
+      "observability": {
+        "run_attempts": 0
+      }
+    },
+    {
+      "task_id": "ASM-007",
+      "title": "Generate pack/context.md with deterministic snippet selection and truncation",
+      "model": "gpt-5.2-codex",
+      "status": "unstarted",
+      "assignee": "unassigned",
+      "definition_of_done": [
+        "Selection walks scored files in order until max token budget is met.",
+        "Each selected file emits one snippet with correct lines range and truncated flag.",
+        "Context blocks include path, lines, git, score, truncated metadata.",
+        "Snippet ordering is stable and matches the index scoring order."
+      ],
+      "recommended": {
+        "approach": "Track remaining token budget and compute line ranges after truncation."
+      },
+      "observability": {
+        "run_attempts": 0
+      }
+    },
+    {
+      "task_id": "ASM-008",
+      "title": "Implement Phase 2 lint rules for duplicate and contradictory directives",
+      "model": "gpt-5.1-codex-mini",
+      "status": "unstarted",
+      "assignee": "unassigned",
+      "definition_of_done": [
+        "Duplicate \"do not\" rules across docs are detected and reported.",
+        "Contradictory \"must\" vs \"must not\" rules in classes 1-4 are reported.",
+        "Issues use stable id values and severity limited to info|warn|error.",
+        "pack/lint.json ordering is severity then id, deterministic across runs."
+      ],
+      "recommended": {
+        "approach": "Normalize case and whitespace before matching directive lines."
+      },
+      "observability": {
+        "run_attempts": 0
+      }
+    },
+    {
+      "task_id": "ASM-009",
+      "title": "Wire assembly build CLI to emit deterministic pack outputs",
+      "model": "gpt-5.2-codex",
+      "status": "unstarted",
+      "assignee": "unassigned",
+      "definition_of_done": [
+        "assembly build reads repo, task input, include/exclude, out, max-tokens, task-id.",
+        "pack/manifest.json reflects inputs, outputs, repo_commit, created_at, tool_version.",
+        "pack/policy.md is emitted as an empty file.",
+        "All pack files are written under the requested out directory with stable paths."
+      ],
+      "recommended": {
+        "approach": "Build outputs in memory, then write to disk in a fixed order."
+      },
+      "observability": {
+        "run_attempts": 0
+      }
+    },
+    {
+      "task_id": "ASM-010",
+      "title": "Add Phase 2 determinism acceptance tests",
+      "model": "gpt-5.1-codex-mini",
+      "status": "unstarted",
+      "assignee": "unassigned",
+      "definition_of_done": [
+        "Running assembly build twice produces identical pack outputs except manifest.created_at.",
+        "context.md ordering and index.json ordering are stable across runs.",
+        "lint.json severities are constrained to info|warn|error with stable id ordering."
+      ],
+      "recommended": {
+        "approach": "Freeze inputs and compare normalized outputs with created_at stripped."
+      },
+      "observability": {
+        "run_attempts": 0
       }
     }
   ]
