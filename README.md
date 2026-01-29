@@ -13,6 +13,23 @@ some chewing gum.
 - Phase 2 complete
   - Deterministic pack production tasks are tracked in `prd.json`.
 
+## Usage
+Build a pack from a repo and task input:
+```
+python -m assembly build --repo . --task "@task.txt" --task-id ASM-011
+```
+
+Common options:
+- `--task` accepts inline text or `@<file>` references.
+- `--out` defaults to `pack/` and contains `manifest.json`, `index.json`, `context.md`, `policy.md`, `lint.json`.
+- `--max-tokens` defaults to `6000`.
+- `--include`/`--exclude` can be repeated to override the default globs.
+
+If you prefer the wrapper script:
+```
+./bin/assembly build --repo . --task "Summarize repo structure." --task-id ASM-012
+```
+
 ## How to use this repo
 - Read the spec: `ASSEMBLY_SPEC.md`.
 - Use the pack contract: `INTERFACE.md`.
