@@ -6,12 +6,12 @@ Note: This project is ~80% AI-generated using
 [Codex CLI](https://github.com/openai/codex), a Swiss Army knife, duct tape, and
 some chewing gum.
 
-## Completion status (as of 2026-01-27)
+## Completion status (as of 2026-01-29)
 - Phase 1 complete
-    - Spec and interface docs are complete (`ASSEMBLY_SPEC.md`, `INTERFACE.md`).
-    - Example pack is checked in (`assembly/examples/pack-minimal/`).
-- Phase 2 next
-    - Deterministic pack production (see [ASSEMBLY_SPEC](./ASSEMBLY_SPEC.md)).
+  - Spec and interface docs are complete (`ASSEMBLY_SPEC.md`, `INTERFACE.md`).
+  - Example pack is checked in (`assembly/examples/pack-minimal/`).
+- Phase 2 complete
+  - Deterministic pack production tasks are tracked in `prd.json`.
 
 ## How to use this repo
 - Read the spec: `ASSEMBLY_SPEC.md`.
