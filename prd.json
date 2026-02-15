@@ -1,208 +1,234 @@
 {
   "tasks": [
     {
-      "task_id": "ASM-001",
-      "title": "Define pack/manifest.json schema in INTERFACE.md",
-      "model": "gpt-5.1-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "INTERFACE.md exists in repo root.",
-        "Manifest section lists required fields with types and constraints.",
-        "repo_commit fallback of \"unknown\" and created_at RFC3339 are documented.",
-        "Minimal manifest example JSON included."
-      ],
-      "recommended": {
-        "approach": "Keep schema descriptions precise and machine-oriented; prefer tables or bullet lists."
-      },
-      "observability": {
-        "run_attempts": 1,
-        "last_note": "Run 20260127T224200Z-65016 completed"
-      }
-    },
-    {
-      "task_id": "ASM-002",
-      "title": "Define pack/index.json schema in INTERFACE.md",
-      "model": "gpt-5.1-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "Index section lists files entry fields: path, sha256, size_bytes, token_est, score, selected.",
-        "Index section documents total_token_est and its relation to file entries.",
-        "Minimal index example JSON included."
-      ],
-      "recommended": {
-        "approach": "Keep types explicit (string, integer, boolean) and mark required fields."
-      },
-      "observability": {
-        "run_attempts": 1,
-        "last_note": "Run 20260127T224306Z-66541 completed"
-      }
-    },
-    {
-      "task_id": "ASM-003",
-      "title": "Define pack/context.md and pack/policy.md formats in INTERFACE.md",
-      "model": "gpt-5.1-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "Context block format documented with required metadata keys and delimiter lines.",
-        "Documented semantics for lines range, truncated flag, and git commit.",
-        "Policy.md documented as an empty file in Phase 1."
-      ],
-      "recommended": {
-        "approach": "Describe the block layout line-by-line and include a short example."
-      },
-      "observability": {
-        "run_attempts": 1,
-        "last_note": "Run 20260127T224413Z-68074 completed"
-      }
-    },
-    {
-      "task_id": "ASM-004",
-      "title": "Define pack/lint.json schema in INTERFACE.md",
-      "model": "gpt-5.1-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "Lint section lists issues entry fields: id, severity, message, files.",
-        "Severity constrained to info|warn|error is documented.",
-        "Minimal lint example JSON included."
-      ],
-      "recommended": {
-        "approach": "Keep lint schema minimal; avoid suggesting extra severity levels."
-      },
-      "observability": {
-        "run_attempts": 1,
-        "last_note": "Run 20260127T224505Z-69278 completed"
-      }
-    },
-    {
-      "task_id": "ASM-005",
-      "title": "Create assembly/examples/pack-minimal/ sample pack",
-      "model": "gpt-5.1-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "Directory assembly/examples/pack-minimal/ exists with manifest.json, index.json, context.md, policy.md, lint.json.",
-        "Sample contents match INTERFACE.md schema and are internally consistent.",
-        "policy.md is present and empty."
-      ],
-      "recommended": {
-        "approach": "Use a tiny, consistent example with one file entry and one context block."
-      },
-      "observability": {
-        "run_attempts": 1,
-        "last_note": "Run 20260127T224552Z-70527 completed"
-      }
-    },
-    {
-      "task_id": "ASM-006",
-      "title": "Implement deterministic file inventory, scoring, and pack/index.json",
+      "task_id": "ASM-011",
+      "status": "unstarted",
       "model": "gpt-5.2-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
+      "title": "Add red regression tests for runtime-artifact exclusion",
       "definition_of_done": [
-        "Include/exclude globs are applied with defaults and repo-relative POSIX paths.",
-        "File class priority and ASCII path ordering drive deterministic scoring.",
-        "Each index entry includes path, sha256, size_bytes, token_est, score, selected.",
-        "total_token_est equals the sum of token_est across files."
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "New tests prove files under `.ralph/**` are excluded from inventory, index, and context outputs by default.",
+        "Exclusion behavior is deterministic across repeated runs on the same repo state.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "recommended": {
-        "approach": "Build a stable candidate list first, then derive scores and hashes in one pass."
+        "approach": "Add focused pytest coverage that builds from a temp repo containing `.ralph/` files and asserts they are never selected."
       },
-      "observability": {
-        "run_attempts": 1,
-        "last_run_id": "20260129T030857Z-2680",
-        "last_update_utc": "2026-01-29T03:12:02Z",
-        "last_note": "Run 20260129T030857Z-2680 completed"
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
       }
     },
     {
-      "task_id": "ASM-007",
-      "title": "Generate pack/context.md with deterministic snippet selection and truncation",
+      "task_id": "ASM-012",
+      "status": "unstarted",
       "model": "gpt-5.2-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
+      "title": "Exclude `.ralph/**` in default glob filters",
       "definition_of_done": [
-        "Selection walks scored files in order until max token budget is met.",
-        "Each selected file emits one snippet with correct lines range and truncated flag.",
-        "Context blocks include path, lines, git, score, truncated metadata.",
-        "Snippet ordering is stable and matches the index scoring order."
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "Default excludes include `.ralph/**` in both inventory and index construction paths without changing existing default ordering guarantees.",
+        "The change preserves deterministic file ordering and scoring behavior.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "recommended": {
-        "approach": "Track remaining token budget and compute line ranges after truncation."
+        "approach": "Update shared default exclude constants once and reuse them everywhere include/exclude normalization occurs."
       },
-      "observability": {
-        "run_attempts": 1,
-        "last_run_id": "20260129T031202Z-4724",
-        "last_update_utc": "2026-01-29T03:14:46Z",
-        "last_note": "Run 20260129T031202Z-4724 completed"
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
       }
     },
     {
-      "task_id": "ASM-008",
-      "title": "Implement Phase 2 lint rules for duplicate and contradictory directives",
-      "model": "gpt-5.1-codex-mini",
-      "status": "completed",
-      "assignee": "ralph-loop",
-      "definition_of_done": [
-        "Duplicate \"do not\" rules across docs are detected and reported.",
-        "Contradictory \"must\" vs \"must not\" rules in classes 1-4 are reported.",
-        "Issues use stable id values and severity limited to info|warn|error.",
-        "pack/lint.json ordering is severity then id, deterministic across runs."
-      ],
-      "recommended": {
-        "approach": "Normalize case and whitespace before matching directive lines."
-      },
-      "observability": {
-        "run_attempts": 2,
-        "last_run_id": "20260129T032054Z-11563",
-        "last_update_utc": "2026-01-29T03:27:29Z",
-        "last_note": "Run 20260129T032054Z-11563 completed"
-      }
-    },
-    {
-      "task_id": "ASM-009",
-      "title": "Wire assembly build CLI to emit deterministic pack outputs",
+      "task_id": "ASM-013",
+      "status": "unstarted",
       "model": "gpt-5.2-codex",
-      "status": "completed",
-      "assignee": "ralph-loop",
+      "title": "Add red CLI tests for additive include/exclude flags",
       "definition_of_done": [
-        "assembly build reads repo, task input, include/exclude, out, max-tokens, task-id.",
-        "pack/manifest.json reflects inputs, outputs, repo_commit, created_at, tool_version.",
-        "pack/policy.md is emitted as an empty file.",
-        "All pack files are written under the requested out directory with stable paths."
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "Tests define expected parsing and behavior for additive flags (for example `--include-add` and `--exclude-add`) without re-specifying defaults.",
+        "Tests cover deterministic ordering when additive globs are repeated or overlap.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "recommended": {
-        "approach": "Build outputs in memory, then write to disk in a fixed order."
+        "approach": "Introduce CLI-level tests that assert normalized include/exclude arrays before touching implementation."
       },
-      "observability": {
-        "run_attempts": 1,
-        "last_run_id": "20260129T032729Z-16155",
-        "last_update_utc": "2026-01-29T03:30:11Z",
-        "last_note": "Run 20260129T032729Z-16155 completed"
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
       }
     },
     {
-      "task_id": "ASM-010",
-      "title": "Add Phase 2 determinism acceptance tests",
-      "model": "gpt-5.1-codex-mini",
-      "status": "completed",
-      "assignee": "ralph-loop",
+      "task_id": "ASM-014",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Implement additive include glob behavior",
       "definition_of_done": [
-        "Running assembly build twice produces identical pack outputs except manifest.created_at.",
-        "context.md ordering and index.json ordering are stable across runs.",
-        "lint.json severities are constrained to info|warn|error with stable id ordering."
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "CLI accepts additive include globs and merges them with default includes so callers can extend defaults safely.",
+        "Merged include glob ordering is deterministic and stable across runs.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "recommended": {
-        "approach": "Freeze inputs and compare normalized outputs with created_at stripped."
+        "approach": "Add explicit `include-add` argument handling and centralize merge logic so include normalization remains deterministic."
       },
-      "observability": {
-        "run_attempts": 1,
-        "last_run_id": "20260129T033011Z-18067",
-        "last_update_utc": "2026-01-29T03:32:05Z",
-        "last_note": "Run 20260129T033011Z-18067 completed"
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-015",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Implement additive exclude glob behavior",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "CLI accepts additive exclude globs and merges them with default excludes so callers can extend defaults safely.",
+        "Merged exclude glob ordering is deterministic and consistently applied to inventory, index, context, and lint inputs.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Reuse the same merge utility as include-add handling, with explicit tests for overlap and duplicate exclusion patterns."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-016",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Add red tests for machine-readable build summary output",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "Tests define a JSON summary contract that includes build status and resolved output paths for external callers.",
+        "Tests assert the summary is parseable JSON with stable field ordering and deterministic path normalization.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Create integration tests that run `assembly build`, capture stdout, parse JSON, and assert exact keys and value shapes."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-017",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Emit deterministic JSON build summary to stdout",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "Build command emits machine-readable JSON summary with build outcome and resolved output artifact paths.",
+        "Summary output stays deterministic for a fixed repo state and input set.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Construct the summary object from already-computed build data and serialize with deterministic key insertion order."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-018",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Add summary suppression flag and coverage",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "CLI exposes a flag to suppress JSON summary output when callers need quiet stdout.",
+        "Tests verify both enabled and suppressed modes with deterministic behavior in each mode.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Implement suppression as a boolean CLI option and gate only stdout summary emission without affecting generated artifacts."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-019",
+      "status": "unstarted",
+      "model": "gpt-5.2-codex",
+      "title": "Add end-to-end deterministic integration tests for new CLI contract",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "Integration tests cover additive include/exclude behavior, `.ralph/**` contamination prevention, and JSON summary parseability.",
+        "Tests prove repeated builds produce stable outputs under identical inputs (excluding timestamp fields where applicable).",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Reuse the existing determinism test pattern and add focused assertions for the new flag combinations."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-020",
+      "status": "unstarted",
+      "model": "gpt-5.1-codex",
+      "title": "Update README with additive glob and summary behavior",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "README documents additive include/exclude flags, summary output behavior, suppression flag usage, and deterministic expectations for agent callers.",
+        "Examples show how to extend default globs without restating defaults and how to consume summary JSON.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Update only the CLI usage and development sections needed for the new contract, with concise copy-and-paste examples."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
+      }
+    },
+    {
+      "task_id": "ASM-021",
+      "status": "unstarted",
+      "model": "gpt-5.1-codex",
+      "title": "Update INTERFACE.md with the revised CLI integration contract",
+      "definition_of_done": [
+        "Write or update failing tests before code changes (red first), then implement the fix.",
+        "INTERFACE.md documents additive glob semantics, machine-readable summary payload fields, and summary suppression behavior for callers.",
+        "Interface text explicitly states determinism guarantees and path normalization rules for the summary contract.",
+        "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
+      ],
+      "recommended": {
+        "approach": "Keep interface updates narrow: add a CLI contract subsection and one canonical summary example JSON object."
+      },
+      "verification": {
+        "commands": [
+          "PYTHONPATH=. pytest assembly/tests",
+          "Run all configured linters and require zero failures before completion."
+        ]
       }
     }
   ]
