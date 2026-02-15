@@ -26,7 +26,9 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     build.add_argument("--max-tokens", type=int, default=6000, help="Token budget")
     build.add_argument("--task-id", required=True, help="Task identifier")
     build.add_argument("--include", action="append", help="Glob to include")
+    build.add_argument("--include-add", action="append", help="Glob to include (additive)")
     build.add_argument("--exclude", action="append", help="Glob to exclude")
+    build.add_argument("--exclude-add", action="append", help="Glob to exclude (additive)")
 
     return parser.parse_args(argv)
 
@@ -73,10 +75,23 @@ def _git_commit(repo_root: Path) -> str:
     return sha
 
 
-def _normalize_globs(values: Iterable[str] | None, defaults: list[str]) -> list[str]:
-    if values is None:
-        return list(defaults)
-    return list(values)
+def _resolve_globs(
+    base: Iterable[str] | None,
+    additions: Iterable[str] | None,
+    defaults: list[str],
+) -> list[str]:
+    if base is None:
+        resolved = list(defaults)
+    else:
+        resolved = list(base)
+    seen = set(resolved)
+    if additions:
+        for value in additions:
+            if value in seen:
+                continue
+            resolved.append(value)
+            seen.add(value)
+    return resolved
 
 
 def _created_at() -> str:
@@ -97,8 +112,8 @@ def _output_posix(repo_root: Path, out_dir: Path, filename: str) -> str:
 
 def build_pack(args: argparse.Namespace) -> int:
     repo_root = _resolve_repo(args.repo)
-    includes = _normalize_globs(args.include, indexer.DEFAULT_INCLUDES)
-    excludes = _normalize_globs(args.exclude, indexer.DEFAULT_EXCLUDES)
+    includes = _resolve_globs(args.include, args.include_add, indexer.DEFAULT_INCLUDES)
+    excludes = _resolve_globs(args.exclude, args.exclude_add, indexer.DEFAULT_EXCLUDES)
     task_paths = _task_paths(args.task, repo_root)
     git_sha = _git_commit(repo_root)
 

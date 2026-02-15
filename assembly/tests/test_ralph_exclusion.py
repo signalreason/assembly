@@ -23,7 +23,9 @@ def _run_build(repo_root: Path, out_dir: Path, *, task_text: str, task_id: str, 
         max_tokens=max_tokens,
         task_id=task_id,
         include=None,
+        include_add=None,
         exclude=None,
+        exclude_add=None,
     )
     assert cli.build_pack(args) == 0
 

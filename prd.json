@@ -62,10 +62,16 @@
         "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "model": "gpt-5.2-codex",
+      "observability": {
+        "last_note": "Run 20260215T053024Z-14251 completed",
+        "last_run_id": "20260215T053024Z-14251",
+        "last_update_utc": "2026-02-15T05:33:22Z",
+        "run_attempts": 1
+      },
       "recommended": {
         "approach": "Introduce CLI-level tests that assert normalized include/exclude arrays before touching implementation."
       },
-      "status": "unstarted",
+      "status": "completed",
       "task_id": "ASM-013",
       "title": "Add red CLI tests for additive include/exclude flags",
       "verification": {
