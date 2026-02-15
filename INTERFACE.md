@@ -198,3 +198,37 @@ truncated: false
   ]
 }
 ```
+
+## CLI Contract
+
+### Deterministic include/exclude globs
+- `assembly build --repo <path> --task <text-or-@file> --task-id <id>` is the canonical entry point; `--out pack/` and `--max-tokens 6000` remain defaults.
+- Base include globs default to `["**/*"]` and base excludes default to `.git/**`, `.ralph/**`, `node_modules/**`, `dist/**`, `build/**`, `target/**`, `vendor/**`, `.venv/**`, `__pycache__/**`, `.DS_Store`.
+- `--include` or `--exclude` replace the entire respective list; additive flags (`--include-add`, `--exclude-add`) append new patterns without restating the defaults.
+- The merger is deterministic: base entries are kept in order, additive entries are appended in the order provided, and duplicates are removed while preserving the first occurrence. Identical inputs therefore always yield the same arrays and downstream file ordering.
+- `pack/manifest.json.inputs.include` and `.exclude` surface the exact lists used during selection so callers can verify glob provenance without recomputing the merge rules.
+
+### Machine-readable build summary
+- After a successful build the CLI prints a JSON summary to stdout unless `--no-summary` is present. The object currently contains:
+  - `status`: string outcome (`"ok"` on success; no summary is emitted on failure).
+  - `outputs`: object with `manifest`, `index`, `context`, `policy`, and `lint` keys. Each value is the resolved absolute path to the artifact rooted at `--out`.
+- Paths are normalized by resolving `--out/<file>` on the host filesystem and serializing the result with `Path.as_posix()`, yielding absolute forward-slash strings even on Windows. If resolution fails (for example, due to permissions), the CLI falls back to the lexical path but still serializes with POSIX separators.
+- The payload is serialized via `json.dumps(..., sort_keys=True, indent=2, ensure_ascii=True)` followed by a trailing newline, so identical repos, flags, and output directories always produce byte-for-byte identical summaries.
+
+#### Canonical summary example
+```
+{
+  "outputs": {
+    "context": "/abs/repo/pack/context.md",
+    "index": "/abs/repo/pack/index.json",
+    "lint": "/abs/repo/pack/lint.json",
+    "manifest": "/abs/repo/pack/manifest.json",
+    "policy": "/abs/repo/pack/policy.md"
+  },
+  "status": "ok"
+}
+```
+
+### Summary suppression behavior
+- `--no-summary` suppresses the stdout payload while still writing every pack artifact to disk. Callers that dedicate stdout to another protocol can enable this flag and rely solely on exit codes plus known `--out` paths.
+- Suppression affects only the summary emission; globs, selection, manifest/index/context contents, and linting proceed unchanged so deterministic pack behavior is preserved.
