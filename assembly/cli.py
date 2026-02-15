@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -99,6 +100,20 @@ def _output_posix(repo_root: Path, out_dir: Path, filename: str) -> str:
     return out_path.as_posix()
 
 
+def _resolved_output(out_dir: Path, filename: str) -> str:
+    out_path = out_dir / filename
+    try:
+        resolved = out_path.resolve()
+    except OSError:
+        resolved = out_path
+    return resolved.as_posix()
+
+
+def _write_summary(summary: dict[str, object]) -> None:
+    payload = json.dumps(summary, sort_keys=True, indent=2, ensure_ascii=True) + "\n"
+    sys.stdout.write(payload)
+
+
 def build_pack(args: argparse.Namespace) -> int:
     repo_root = _resolve_repo(args.repo)
     includes = _resolve_globs(args.include, args.include_add, indexer.DEFAULT_INCLUDES)
@@ -167,6 +182,17 @@ def build_pack(args: argparse.Namespace) -> int:
     context_builder.write_context_md(blocks, context_path)
     policy_path.write_bytes(b"")
     lint_builder.write_lint_json(lint_data, lint_path)
+    summary = {
+        "status": "ok",
+        "outputs": {
+            "manifest": _resolved_output(out_dir, "manifest.json"),
+            "index": _resolved_output(out_dir, "index.json"),
+            "context": _resolved_output(out_dir, "context.md"),
+            "policy": _resolved_output(out_dir, "policy.md"),
+            "lint": _resolved_output(out_dir, "lint.json"),
+        },
+    }
+    _write_summary(summary)
     return 0
 
 
