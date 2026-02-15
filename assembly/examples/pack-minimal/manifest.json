@@ -8,6 +8,7 @@
     "include": ["**/*"],
     "exclude": [
       ".git/**",
+      ".ralph/**",
       "node_modules/**",
       "dist/**",
       "build/**",

@@ -49,6 +49,7 @@ The manifest lists canonical pack files so other tools can fetch them without as
     "include": ["**/*"],
     "exclude": [
       ".git/**",
+      ".ralph/**",
       "node_modules/**",
       "dist/**",
       "build/**",

@@ -17,7 +17,7 @@ Defaults:
 - `--max-tokens` = `6000`
 - `--task-id` = required
 - include: `**/*`
-- exclude (default): `.git/**`, `node_modules/**`, `dist/**`, `build/**`, `target/**`, `vendor/**`, `.venv/**`, `__pycache__/**`, `.DS_Store`
+- exclude (default): `.git/**`, `.ralph/**`, `node_modules/**`, `dist/**`, `build/**`, `target/**`, `vendor/**`, `.venv/**`, `__pycache__/**`, `.DS_Store`
 
 Token estimator: `ceil(chars/4)` (ASCII, UTF-8 bytes treated as chars).
 
@@ -112,4 +112,3 @@ Produce `policy.md` by extracting rules from selected snippets.
 - No semantic relevance ranking beyond file class.
 - No embeddings, model calls, or repo indexing services.
 - No patch/test/commit automation.
-

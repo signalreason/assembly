@@ -35,10 +35,16 @@
         "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "model": "gpt-5.2-codex",
+      "observability": {
+        "last_note": "Run 20260215T052827Z-14251 completed",
+        "last_run_id": "20260215T052827Z-14251",
+        "last_update_utc": "2026-02-15T05:30:24Z",
+        "run_attempts": 1
+      },
       "recommended": {
         "approach": "Update shared default exclude constants once and reuse them everywhere include/exclude normalization occurs."
       },
-      "status": "unstarted",
+      "status": "completed",
       "task_id": "ASM-012",
       "title": "Exclude `.ralph/**` in default glob filters",
       "verification": {
