@@ -251,10 +251,16 @@
         "Do not mark this task complete until all relevant tests and configured linters pass with zero failures."
       ],
       "model": "gpt-5.1-codex",
+      "observability": {
+        "last_note": "Run 20260215T054613Z-14251 completed",
+        "last_run_id": "20260215T054613Z-14251",
+        "last_update_utc": "2026-02-15T05:47:43Z",
+        "run_attempts": 1
+      },
       "recommended": {
         "approach": "Update only the CLI usage and development sections needed for the new contract, with concise copy-and-paste examples."
       },
-      "status": "unstarted",
+      "status": "completed",
       "task_id": "ASM-020",
       "title": "Update README with additive glob and summary behavior",
       "verification": {
