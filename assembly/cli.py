@@ -30,6 +30,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     build.add_argument("--include-add", action="append", help="Glob to include (additive)")
     build.add_argument("--exclude", action="append", help="Glob to exclude")
     build.add_argument("--exclude-add", action="append", help="Glob to exclude (additive)")
+    build.add_argument("--no-summary", action="store_true", help="Suppress JSON summary output")
 
     return parser.parse_args(argv)
 
@@ -192,7 +193,8 @@ def build_pack(args: argparse.Namespace) -> int:
             "lint": _resolved_output(out_dir, "lint.json"),
         },
     }
-    _write_summary(summary)
+    if not args.no_summary:
+        _write_summary(summary)
     return 0
 
 

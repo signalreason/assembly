@@ -26,6 +26,7 @@ def _run_build(repo_root: Path, out_dir: Path, *, task_text: str, task_id: str, 
         include_add=None,
         exclude=None,
         exclude_add=None,
+        no_summary=False,
     )
     assert cli.build_pack(args) == 0
 
