@@ -80,18 +80,7 @@ def _resolve_globs(
     additions: Iterable[str] | None,
     defaults: list[str],
 ) -> list[str]:
-    if base is None:
-        resolved = list(defaults)
-    else:
-        resolved = list(base)
-    seen = set(resolved)
-    if additions:
-        for value in additions:
-            if value in seen:
-                continue
-            resolved.append(value)
-            seen.add(value)
-    return resolved
+    return indexer.merge_globs(base=base, additions=additions, defaults=defaults)
 
 
 def _created_at() -> str:

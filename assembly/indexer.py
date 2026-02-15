@@ -27,6 +27,25 @@ DEFAULT_EXCLUDES = [
 ]
 
 
+def merge_globs(
+    base: Iterable[str] | None,
+    additions: Iterable[str] | None,
+    defaults: list[str],
+) -> list[str]:
+    if base is None:
+        resolved = list(defaults)
+    else:
+        resolved = list(base)
+    seen = set(resolved)
+    if additions:
+        for value in additions:
+            if value in seen:
+                continue
+            resolved.append(value)
+            seen.add(value)
+    return resolved
+
+
 @dataclass(frozen=True)
 class IndexEntry:
     path: str
