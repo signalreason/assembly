@@ -31,3 +31,13 @@ def test_resolve_globs_prefers_explicit_base_then_adds() -> None:
     )
 
     assert result == ["src/**", "docs/**", "tests/**"]
+
+
+def test_resolve_globs_dedupes_base_before_additions() -> None:
+    result = indexer.merge_globs(
+        base=["src/**", "src/**", "docs/**"],
+        additions=["docs/**", "tests/**"],
+        defaults=indexer.DEFAULT_EXCLUDES,
+    )
+
+    assert result == ["src/**", "docs/**", "tests/**"]
