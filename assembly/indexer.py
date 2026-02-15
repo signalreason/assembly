@@ -15,6 +15,7 @@ from typing import Iterable, Iterator, Sequence
 DEFAULT_INCLUDES = ["**/*"]
 DEFAULT_EXCLUDES = [
     ".git/**",
+    ".ralph/**",
     "node_modules/**",
     "dist/**",
     "build/**",
